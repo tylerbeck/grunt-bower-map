@@ -1,0 +1,27 @@
+{
+  "name": "grunt-bower-map",
+  "version": "0.1.0",
+  "authors": [
+    "Tyler Beck <code@tylerbeck.com>"
+  ],
+  "description": "Copy Bower dependencies.",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "q": "~1.0.1",
+    "html5shiv": "~3.7.2",
+    "normalize-css": "~3.0.2",
+    "lodash": "~2.4.1",
+    "bootstrap": "~3.2.0"
+  },
+  "devDependencies": {
+    "bootstrap": "~3.2.0"
+  }
+}
