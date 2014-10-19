@@ -27,7 +27,7 @@ grunt.initConfig({
    'bower-map': {
        default: {
            options: {
-                dest: 'assets/lib',
+                dest: 'lib',
            }
        }
    }
@@ -98,7 +98,46 @@ grunt.initConfig({
 ```
 
 #### Custom Options
-TODO
+
+```js
+grunt.initConfig({
+		'bower-map': {
+			options:{
+				bowerPath: "tmp/bower_components",
+				useNamespace: false,
+				ignore: ["bootstrap"],
+				shim:{
+					q: "q.js"
+				}
+			},
+			css: {
+				options:{
+					dest: "tmp/lib/css",
+					extensions:['css']
+				}
+			},
+			js: {
+				options:{
+					dest: "tmp/lib/js",
+					extensions:['js']
+				}
+			},
+			less: {
+				options:{
+					dest: "tmp/lib/less",
+					extensions:['less']
+				}
+			},
+			fonts: {
+				options:{
+					dest: "tmp/lib/fonts",
+					extensions:['ttf','woff','eot','svg']
+				}
+			}
+
+		},
+});
+```
 
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
