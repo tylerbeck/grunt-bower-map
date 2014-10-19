@@ -103,39 +103,39 @@ grunt.initConfig({
 grunt.initConfig({
 		'bower-map': {
 			options:{
-				bowerPath: "tmp/bower_components",
+				bowerPath: "bower_components",
 				useNamespace: false,
-				ignore: ["bootstrap"],
+				ignore: ["ignore-package"],
 				shim:{
 					q: "q.js"
 				}
 			},
 			css: {
 				options:{
-					dest: "tmp/lib/css",
+					dest: "lib/css",
 					extensions:['css']
 				}
 			},
 			js: {
 				options:{
-					dest: "tmp/lib/js",
+					dest: "lib/js",
 					extensions:['js']
 				}
 			},
 			less: {
 				options:{
-					dest: "tmp/lib/less",
+					dest: "lib/less",
 					extensions:['less']
 				}
 			},
 			fonts: {
 				options:{
-					dest: "tmp/lib/fonts",
+					dest: "lib/fonts",
 					extensions:['ttf','woff','eot','svg']
 				}
 			}
 
-		},
+		}
 });
 ```
 
