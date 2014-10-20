@@ -19,7 +19,8 @@
  * @returns { BowerMap }
  * @constructor
  */
-module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignore, maintainCommonPaths, useNamespace, extensions, done ) {
+module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignore,
+                                    maintainCommonPaths, useNamespace, extensions, done ) {
 
 	'use strict';
 

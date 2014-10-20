@@ -67,6 +67,15 @@ Type: `Object`
 Default value: `undefined`
 
 An object used to remap component file destinations.
+Map values can rename or put component files in a location other than the default libPath
+```allowable values
+  <file-path>: <new-file-path>
+  <directory>: <new-directory>
+  <component>:{
+       <relative-file-path>: <new-file-path>
+       <relative-directory>: <new-directory>
+  }
+```
 
 #### shim
 Type: `Object`

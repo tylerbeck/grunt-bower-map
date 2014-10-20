@@ -44,7 +44,7 @@ module.exports = function(grunt) {
 			options:{
 				bowerPath: "tmp/bower_components",
 				useNamespace: false,
-				ignore: ["bootstrap"],
+				ignore: ["unused"],
 				shim:{
 					q: "q.js"
 				}
