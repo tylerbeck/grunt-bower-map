@@ -99,4 +99,13 @@ module.exports = function(grunt) {
 	// By default, lint and run all tests.
 	grunt.registerTask('default', ['jshint', 'test']);
 
+	grunt.registerTask('tmp', function(){
+		var path = require('path');
+		var pathSepRegExp = /[\\\/]/gi;
+		path.normSep = function( val ){
+			return path.normalize( val.replace( pathSepRegExp, path.sep ));
+		};
+		console.log( path.normSep("this\\is/a\\path/to\\something") );
+	});
+
 };

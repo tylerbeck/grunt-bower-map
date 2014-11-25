@@ -43,6 +43,10 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignor
 
 	var pathSepRegExp = /[\\\/]/gi;
 
+	path.fix = function( val ){
+		return path.normalize( val.replace( pathSepRegExp, path.sep ) );
+	};
+
 	/*================================================
 	 * Public Methods
 	 *===============================================*/
@@ -150,7 +154,7 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignor
 			var value = map[ packageName ];
 
 			//get full source path for package
-			var src = path.normalize( path.join( bowerPath, packageName ) );
+			var src = path.fix( path.join( bowerPath, packageName ) );
 			var exists = grunt.file.exists( src );
 
 			//continue if the source exists
@@ -158,7 +162,7 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignor
 				if ( grunt.file.isFile( src ) ) {
 					//src is a file, it must be mapped to a string value
 					if ( typeof value === "string" ) {
-						expanded[ src ] = path.normalize( path.join( destPath, value ) );
+						expanded[ src ] = path.fix( path.join( destPath, value ) );
 					}
 					else {
 						grunt.log.error( 'Invalid mapped value for: ' + src );
@@ -176,19 +180,19 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignor
 						var fileNames = Object.keys( value );
 						fileNames.forEach( function( fileName ){
 							//get file source
-							fsrc = path.normalize( path.join( src, fileName ) );
+							fsrc = path.fix( path.join( src, fileName ) );
 							//get file destination path
-							fpath = path.normalize( path.join( destPath, value[ fileName ] ) );
+							fpath = path.fix( path.join( destPath, value[ fileName ] ) );
 							if ( grunt.file.isFile( fsrc ) ) {
 								//source exists, continue with mapping
 								expanded[ fsrc ] = fpath;
 							}
 							else if ( grunt.file.isDir( fsrc ) ) {
-								grunt.verbose.writeln( '   map directory: ' + fsrc + '/**' );
-								glob.sync( fsrc + '/**', { dot: true } ).forEach( function( filename ) {
-									filename = path.normalize( filename );
+								grunt.verbose.writeln( '   map directory: ' + path.join( fsrc, '**' ) );
+								glob.sync( path.join( fsrc, '**' ), { dot: true } ).forEach( function( filename ) {
+									filename = path.fix( filename );
 									if ( grunt.file.isFile( filename ) ) {
-										fpath = path.normalize( path.join( destPath, value[ fileName ], filename.replace( fsrc, "" ) ) );
+										fpath = path.fix( path.join( destPath, value[ fileName ], filename.replace( fsrc, "" ) ) );
 										grunt.verbose.writeln( '     from:' + filename );
 										grunt.verbose.writeln( '       to:' + fpath );
 										expanded[ filename ] = fpath;
@@ -203,11 +207,11 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignor
 					}
 					else if ( typeof value === "string" ) {
 						//map entire directory
-						grunt.verbose.writeln( '   map directory: ' + src + '/**' );
-						glob.sync( src + '/**', { dot: true } ).forEach( function( filename ) {
+						grunt.verbose.writeln( '   map directory: ' + path.join( src, '**' ) );
+						glob.sync( path.join( src, '**' ), { dot: true } ).forEach( function( filename ) {
 							if ( grunt.file.isFile( filename ) ) {
-								filename = path.normalize( filename );
-								fpath = path.normalize( path.join( destPath, value, filename.replace( src, "" ) ) );
+								filename = path.fix( filename );
+								fpath = path.fix( path.join( destPath, value, filename.replace( src, "" ) ) );
 								grunt.verbose.writeln( '     from:' + filename );
 								grunt.verbose.writeln( '       to:' + fpath );
 
@@ -267,7 +271,9 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignor
 		//copy files
 		for ( var k in componentMap ) {
 			if ( componentMap.hasOwnProperty( k ) ) {
-				grunt.file.copy( k, componentMap[ k ] );
+				console.log( path.fix( k ) );
+				console.log( path.fix( componentMap[ k ] ) );
+				grunt.file.copy( path.fix( k ), path.fix( componentMap[ k ] ) );
 			}
 		}
 
@@ -298,7 +304,8 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignor
 			}
 			//we just need the path relative to the module directory
 			files.forEach( function( file ){
-				fileList.push( file.replace( path.join( bowerPath, name ) , "" ) );
+				file = path.fix( file );
+				fileList.push( file.replace( path.fix( path.join( bowerPath, name ) ) , "" ) );
 			});
 		}
 
@@ -324,7 +331,7 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignor
 			//need to iterate over glob style matches
 			grunt.verbose.writeln( '      globbing - ' + path.join( name, file ) );
 			glob.sync( path.join( name, file ), { cwd: bowerPath, dot: true } ).forEach( function( filename ) {
-				var src = path.normalize( path.join( bowerPath, filename ) );
+				var src = path.fix( path.join( bowerPath, filename ) );
 				grunt.verbose.writeln( 'src      ' + src );
 				if ( grunt.file.isFile( src ) ) {
 					if ( expandedMap[ src ] !== undefined ) {
@@ -333,7 +340,7 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignor
 					}
 					else {
 						var newFilename = commonPath === "" ? filename : filename.replace( commonPath, "" );
-						var dest = path.normalize( path.join( destPath, newFilename ) );
+						var dest = path.fix( path.join( destPath, newFilename ) );
 						if ( useNamespace === false || ( useNamespace === undefined && fileList.length === 1 ) ){
 							dest = dest.replace( path.join(destPath,name), destPath );
 						}
@@ -364,16 +371,16 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignor
 		paths.forEach( function( file ) {
 
 			//normalize path seperators
-			file = file.replace( pathSepRegExp, '/' );
+			file = file.replace( pathSepRegExp, path.sep );
 
 			//get resolved path parts for file directory
-			if ( file.charAt(0) === '/' ){
+			if ( file.charAt(0) === path.sep ){
 				file = file.substr(1);
 			}
 			//console.log("   "+file);
 			//console.log("   "+path.dirname( file ));
 			var dirname = path.dirname( file );
-			var parts = dirname === "." ? [] : dirname.split( '/' );
+			var parts = dirname === "." ? [] : dirname.split( path.sep );
 			list.push( parts );
 
 			//save minimum path length for next step
@@ -414,11 +421,11 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignor
 			//	newPaths.push( path.join( list[n].slice( index ) ) );
 			//}
 
-			commonPath = list[0].slice( 0, index ).join( '/' );
+			commonPath = list[0].slice( 0, index ).join( path.sep );
 
 		}
 		else if ( listLength === 1 ) {
-			commonPath = list[0].join( '/' );
+			commonPath = list[0].join( path.sep );
 		}
 
 		return commonPath;
