@@ -176,7 +176,7 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignor
 						var fileNames = Object.keys( value );
 						fileNames.forEach( function( fileName ){
 							//get file source
-							fsrc = path.join( src, fileName );
+							fsrc = path.normalize( path.join( src, fileName ) );
 							//get file destination path
 							fpath = path.normalize( path.join( destPath, value[ fileName ] ) );
 							if ( grunt.file.isFile( fsrc ) ) {
@@ -186,6 +186,7 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignor
 							else if ( grunt.file.isDir( fsrc ) ) {
 								grunt.verbose.writeln( '   map directory: ' + fsrc + '/**' );
 								glob.sync( fsrc + '/**', { dot: true } ).forEach( function( filename ) {
+									filename = path.normalize( filename );
 									if ( grunt.file.isFile( filename ) ) {
 										fpath = path.normalize( path.join( destPath, value[ fileName ], filename.replace( fsrc, "" ) ) );
 										grunt.verbose.writeln( '     from:' + filename );
@@ -205,6 +206,7 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignor
 						grunt.verbose.writeln( '   map directory: ' + src + '/**' );
 						glob.sync( src + '/**', { dot: true } ).forEach( function( filename ) {
 							if ( grunt.file.isFile( filename ) ) {
+								filename = path.normalize( filename );
 								fpath = path.normalize( path.join( destPath, value, filename.replace( src, "" ) ) );
 								grunt.verbose.writeln( '     from:' + filename );
 								grunt.verbose.writeln( '       to:' + fpath );

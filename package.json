@@ -1,7 +1,7 @@
 {
   "name": "grunt-bower-map",
   "description": "Copy Bower dependencies.",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "homepage": "https://github.com/tylerbeck/grunt-bower-map",
   "author": {
     "name": "Tyler Beck",
