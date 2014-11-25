@@ -41,6 +41,8 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignor
 	 *===============================================*/
 	var expandedMap = {};
 
+	var pathSepRegExp = /[\\\/]/gi;
+
 	/*================================================
 	 * Public Methods
 	 *===============================================*/
@@ -359,14 +361,17 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignor
 		//break up paths into parts
 		paths.forEach( function( file ) {
 
+			//normalize path seperators
+			file = file.replace( pathSepRegExp, '/' );
+
 			//get resolved path parts for file directory
-			if ( file.charAt(0) === path.sep ){
+			if ( file.charAt(0) === '/' ){
 				file = file.substr(1);
 			}
 			//console.log("   "+file);
 			//console.log("   "+path.dirname( file ));
 			var dirname = path.dirname( file );
-			var parts = dirname === "." ? [] : dirname.split( path.sep );
+			var parts = dirname === "." ? [] : dirname.split( '/' );
 			list.push( parts );
 
 			//save minimum path length for next step
@@ -407,11 +412,11 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignor
 			//	newPaths.push( path.join( list[n].slice( index ) ) );
 			//}
 
-			commonPath = list[0].slice( 0, index ).join( path.sep );
+			commonPath = list[0].slice( 0, index ).join( '/' );
 
 		}
 		else if ( listLength === 1 ) {
-			commonPath = list[0].join( path.sep );
+			commonPath = list[0].join( '/' );
 		}
 
 		return commonPath;
