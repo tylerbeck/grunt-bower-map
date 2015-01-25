@@ -327,8 +327,12 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, repla
 			}
 			//we just need the path relative to the module directory
 			files.forEach( function( file ){
-				file = path.fix( file );
-				fileList.push( file.replace( path.fix( path.join( bowerPath, name ) ) , "" ) );
+				glob.sync( path.fix( file ), { dot: true } ).forEach( function( filename ) {
+					filename = path.fix( filename );
+					if ( grunt.file.isFile( filename ) ) {
+						fileList.push( filename.replace( path.fix( path.join( bowerPath, name ) ) , "" ) );
+					}
+				} );
 			});
 		}
 

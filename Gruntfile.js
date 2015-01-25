@@ -46,7 +46,7 @@ module.exports = function(grunt) {
 				useNamespace: false,
 				ignore: ["unused"],
 				shim:{
-					q: "q.js"
+					q: "q*.js"
 				}
 			},
 			css: {
