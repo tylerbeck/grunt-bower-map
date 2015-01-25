@@ -11,6 +11,7 @@
  * @param destPath
  * @param shim
  * @param map
+ * @param replace
  * @param ignore
  * @param maintainCommonPaths
  * @param useNamespace
@@ -19,7 +20,7 @@
  * @returns { BowerMap }
  * @constructor
  */
-module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignore,
+module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, replace, ignore,
                                     maintainCommonPaths, useNamespace, extensions, done ) {
 
 	'use strict';
@@ -71,6 +72,25 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignor
 	/*================================================
 	 * Private Methods
 	 *===============================================*/
+	/**
+	 * copies file and re
+	 * @param src
+	 * @param dest
+	 * @param replacements
+	 */
+	function copyReplace( src, dest, replacements ){
+
+		var source = grunt.file.read( src );
+		for ( var s in replacements ){
+			var r = replacements[s];
+			var re = new RegExp( s, "g" );
+			source = source.replace( re, r );
+		}
+		grunt.file.write( dest, source );
+
+	}
+
+
 	/**
 	 * validates bower copy task parameters
 	 * @returns {boolean}
@@ -273,7 +293,10 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, ignor
 			if ( componentMap.hasOwnProperty( k ) ) {
 				console.log( path.fix( k ) );
 				console.log( path.fix( componentMap[ k ] ) );
-				grunt.file.copy( path.fix( k ), path.fix( componentMap[ k ] ) );
+				//grunt.file.copy( path.fix( k ), path.fix( componentMap[ k ] ) );
+				var replacements = replace ? replace[ name ] || {} : {};
+
+				copyReplace( path.fix( k ), path.fix( componentMap[ k ] ), replacements );
 			}
 		}
 

@@ -48,6 +48,7 @@ module.exports = function( grunt ){
 				options.dest,
 				options.shim,
 				options.map,
+				options.replace,
 				options.ignore,
 				options.maintainCommonPaths,
 				options.useNamespace,

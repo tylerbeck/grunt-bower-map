@@ -52,7 +52,12 @@ module.exports = function(grunt) {
 			css: {
 				options:{
 					dest: "tmp/lib/css",
-					extensions:['css']
+					extensions:['css'],
+					replace: {
+						'bootstrap':{
+							"url\\('\\.\\./fonts/": "url('/assets/fonts/"
+						}
+					}
 				}
 			},
 			js: {
