@@ -249,7 +249,7 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, repla
 			}
 
 		});
-
+		//console.log( "map:", expanded );
 		return expanded;
 	}
 
@@ -291,8 +291,8 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, repla
 		//copy files
 		for ( var k in componentMap ) {
 			if ( componentMap.hasOwnProperty( k ) ) {
-				console.log( path.fix( k ) );
-				console.log( path.fix( componentMap[ k ] ) );
+				//console.log( path.fix( k ) );
+				//console.log( path.fix( componentMap[ k ] ) );
 				//grunt.file.copy( path.fix( k ), path.fix( componentMap[ k ] ) );
 				var replacements = replace ? replace[ name ] || {} : {};
 
@@ -332,52 +332,58 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, repla
 			});
 		}
 
+		//expand list
+		var expandedList = [];
+		fileList.forEach( function( file ){
+			grunt.verbose.writeln( '      globbing - ' + path.join( name, file ) );
+			glob.sync( path.join( name, file ), { cwd: bowerPath, dot: true } ).forEach( function( filename ) {
+				var src = path.fix( path.join( bowerPath, filename ) );
+				grunt.verbose.writeln( 'src      ' + src );
+				expandedList.push( src );
+			});
+		});
+
 		//filter filetypes
-		fileList = fileList.filter( function( file ){
+		expandedList = expandedList.filter( function( file ){
 			var ext = path.extname( file ).substr(1);
 			if ( extensions ){
 				return extensions.indexOf( ext ) >= 0;
 			}
 			else{
-				return true
+				return true;
 			}
 		});
 
 
 		//get common path for building destination
-		var commonPath = maintainCommonPaths ? "" : getCommonPathBase( fileList );
+		var commonPath = maintainCommonPaths ? "" : getCommonPathBase( expandedList );
 		grunt.verbose.writeln( '   common path: ' + commonPath );
+
+
 		//build default mapping
 		var componentMap = {};
 		grunt.verbose.writeln( '   mapping files:' );
-		fileList.forEach( function( file ){
-			//need to iterate over glob style matches
-			grunt.verbose.writeln( '      globbing - ' + path.join( name, file ) );
-			glob.sync( path.join( name, file ), { cwd: bowerPath, dot: true } ).forEach( function( filename ) {
-				var src = path.fix( path.join( bowerPath, filename ) );
-				grunt.verbose.writeln( 'src      ' + src );
-				if ( grunt.file.isFile( src ) ) {
-					var ext = path.extname( file ).substr(1);
-					var test = true;
-					if ( extensions ){
-						test = extensions.indexOf( ext ) >= 0;
-					}
-					if (test){
-						if ( expandedMap[ src ] !== undefined ) {
-							//use user configured mapping if set
-							componentMap[ src ] = expandedMap[ src ];
-						}
-						else {
-							var newFilename = commonPath === "" ? filename : filename.replace( commonPath, "" );
-							var dest = path.fix( path.join( destPath, newFilename ) );
-							if ( useNamespace === false || ( useNamespace === undefined && fileList.length === 1 ) ){
-								dest = dest.replace( path.join(destPath,name), destPath );
-							}
-							componentMap[ src ] = dest;
-						}
-					}
+		expandedList.forEach( function( file ){
+
+			if ( expandedMap[ file ] !== undefined ) {
+				//use user configured mapping if set
+				componentMap[ file ] = expandedMap[ file ];
+				grunt.log.writeln( '  * '+file+' -> '+ expandedMap[ file ] );
+			}
+			else {
+				var newFilename = commonPath === "" ? file : file.replace( commonPath, "" );
+				//console.log('      newfileName:',newFilename);
+				var dest = path.join( destPath, newFilename );
+				//console.log('      dest:',dest);
+
+				if ( useNamespace === true || ( useNamespace === undefined && expandedList.length > 1 ) ){
+					dest = dest.replace( destPath, path.join( destPath, name ) );
 				}
-			} );
+				componentMap[ file ] = dest;
+				grunt.log.writeln( '    '+file+' -> '+ dest );
+
+			}
+
 		});
 
 		return componentMap;
