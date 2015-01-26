@@ -317,14 +317,7 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, repla
 		if ( shim[ name ] !== undefined ) {
 			grunt.verbose.writeln( '    using shim value' );
 			//use shim value
-			shim[ name ].forEach( function( file ){
-				glob.sync( path.fix( file ), { dot: true } ).forEach( function( filename ) {
-					if ( grunt.file.isFile( filename ) ) {
-						fileList.push( filename.replace( path.fix( path.join( bowerPath, name ) ) , "" ) );
-					}
-				} );
-			});
-
+			fileList = fileList.concat( shim[ name ] );
 		}
 		else {
 			grunt.verbose.writeln( '    using result value - ' + files );
@@ -334,11 +327,8 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, repla
 			}
 			//we just need the path relative to the module directory
 			files.forEach( function( file ){
-				glob.sync( path.fix( file ), { dot: true } ).forEach( function( filename ) {
-					if ( grunt.file.isFile( filename ) ) {
-						fileList.push( filename.replace( path.fix( path.join( bowerPath, name ) ) , "" ) );
-					}
-				} );
+				file = path.fix( file );
+				fileList.push( file.replace( path.fix( path.join( bowerPath, name ) ) , "" ) );
 			});
 		}
 
@@ -367,17 +357,24 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, repla
 				var src = path.fix( path.join( bowerPath, filename ) );
 				grunt.verbose.writeln( 'src      ' + src );
 				if ( grunt.file.isFile( src ) ) {
-					if ( expandedMap[ src ] !== undefined ) {
-						//use user configured mapping if set
-						componentMap[ src ] = expandedMap[ src ];
+					var ext = path.extname( file ).substr(1);
+					var test = true;
+					if ( extensions ){
+						test = extensions.indexOf( ext ) >= 0;
 					}
-					else {
-						var newFilename = commonPath === "" ? filename : filename.replace( commonPath, "" );
-						var dest = path.fix( path.join( destPath, newFilename ) );
-						if ( useNamespace === false || ( useNamespace === undefined && fileList.length === 1 ) ){
-							dest = dest.replace( path.join(destPath,name), destPath );
+					if (test){
+						if ( expandedMap[ src ] !== undefined ) {
+							//use user configured mapping if set
+							componentMap[ src ] = expandedMap[ src ];
 						}
-						componentMap[ src ] = dest;
+						else {
+							var newFilename = commonPath === "" ? filename : filename.replace( commonPath, "" );
+							var dest = path.fix( path.join( destPath, newFilename ) );
+							if ( useNamespace === false || ( useNamespace === undefined && fileList.length === 1 ) ){
+								dest = dest.replace( path.join(destPath,name), destPath );
+							}
+							componentMap[ src ] = dest;
+						}
 					}
 				}
 			} );
