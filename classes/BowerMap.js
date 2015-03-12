@@ -181,9 +181,12 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, repla
 			if ( exists ) {
 				if ( grunt.file.isFile( src ) ) {
 					//src is a file, it must be mapped to a string value
-					if ( typeof value === "string" ) {
+					if ( typeof value === "string") {
 						expanded[ src ] = path.fix( path.join( destPath, value ) );
 					}
+                    else if (  value === false ){
+                        expanded[ src ] = false;
+                    }
 					else {
 						grunt.log.error( 'Invalid mapped value for: ' + src );
 					}
@@ -202,7 +205,7 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, repla
 							//get file source
 							fsrc = path.fix( path.join( src, fileName ) );
 							//get file destination path
-							fpath = path.fix( path.join( destPath, value[ fileName ] ) );
+							fpath = value[ fileName ] ? path.fix( path.join( destPath, value[ fileName ] ) ) : false;
 							if ( grunt.file.isFile( fsrc ) ) {
 								//source exists, continue with mapping
 								expanded[ fsrc ] = fpath;
@@ -212,7 +215,7 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, repla
 								glob.sync( path.join( fsrc, '**' ), { dot: true } ).forEach( function( filename ) {
 									filename = path.fix( filename );
 									if ( grunt.file.isFile( filename ) ) {
-										fpath = path.fix( path.join( destPath, value[ fileName ], filename.replace( fsrc, "" ) ) );
+										fpath = fpath ? path.fix( path.join( destPath, value[ fileName ], filename.replace( fsrc, "" ) ) ) : false;
 										grunt.verbose.writeln( '     from:' + filename );
 										grunt.verbose.writeln( '       to:' + fpath );
 										expanded[ filename ] = fpath;
@@ -225,20 +228,34 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, repla
 							}
 						});
 					}
-					else if ( typeof value === "string" ) {
-						//map entire directory
-						grunt.verbose.writeln( '   map directory: ' + path.join( src, '**' ) );
-						glob.sync( path.join( src, '**' ), { dot: true } ).forEach( function( filename ) {
-							if ( grunt.file.isFile( filename ) ) {
-								filename = path.fix( filename );
-								fpath = path.fix( path.join( destPath, value, filename.replace( src, "" ) ) );
-								grunt.verbose.writeln( '     from:' + filename );
-								grunt.verbose.writeln( '       to:' + fpath );
+                    else if ( typeof value === "string" ) {
+                        //map entire directory
+                        grunt.verbose.writeln( '   map directory: ' + path.join( src, '**' ) );
+                        glob.sync( path.join( src, '**' ), { dot: true } ).forEach( function( filename ) {
+                            if ( grunt.file.isFile( filename ) ) {
+                                filename = path.fix( filename );
+                                fpath = path.fix( path.join( destPath, value, filename.replace( src, "" ) ) );
+                                grunt.verbose.writeln( '     from:' + filename );
+                                grunt.verbose.writeln( '       to:' + fpath );
 
-								expanded[ filename ] = fpath;
-							}
-						} );
-					}
+                                expanded[ filename ] = fpath;
+                            }
+                        } );
+                    }
+                    else if ( typeof value === false ) {
+                        //map entire directory
+                        grunt.verbose.writeln( '   map directory: ' + path.join( src, '**' ) );
+                        glob.sync( path.join( src, '**' ), { dot: true } ).forEach( function( filename ) {
+                            if ( grunt.file.isFile( filename ) ) {
+                                filename = path.fix( filename );
+                                fpath = false;
+                                grunt.verbose.writeln( '     from:' + filename );
+                                grunt.verbose.writeln( '       to:' + fpath );
+
+                                expanded[ filename ] = fpath;
+                            }
+                        } );
+                    }
 					else {
 						grunt.log.error( 'Invalid mapped value for: ' + src );
 					}
@@ -296,7 +313,9 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, repla
 				//grunt.file.copy( path.fix( k ), path.fix( componentMap[ k ] ) );
 				var replacements = replace ? replace[ name ] || {} : {};
 
-				copyReplace( path.fix( k ), path.fix( componentMap[ k ] ), replacements );
+                if (  componentMap[ k ] !== false){
+                    copyReplace( path.fix( k ), path.fix( componentMap[ k ] ), replacements );
+                }
 			}
 		}
 

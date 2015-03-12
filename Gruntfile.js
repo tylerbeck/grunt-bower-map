@@ -75,7 +75,10 @@ module.exports = function(grunt) {
 			fonts: {
 				options:{
 					dest: "tmp/lib/fonts",
-					extensions:['ttf','woff','eot','svg']
+					extensions:['ttf','woff','eot','svg'],
+                    map: {
+                        "bootstrap/dist/fonts/glyphicons-halflings-regular.svg": false
+                    }
 				}
 			}
 
