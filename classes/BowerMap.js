@@ -80,13 +80,18 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, repla
 	 */
 	function copyReplace( src, dest, replacements ){
 
-		var source = grunt.file.read( src );
-		for ( var s in replacements ){
-			var r = replacements[s];
-			var re = new RegExp( s, "g" );
-			source = source.replace( re, r );
-		}
-		grunt.file.write( dest, source );
+        if ( replacements ){
+            var source = grunt.file.read( src );
+            for ( var s in replacements ){
+                var r = replacements[s];
+                var re = new RegExp( s, "g" );
+                source = source.replace( re, r );
+            }
+            grunt.file.write( dest, source );
+        }
+        else{
+            grunt.file.copy( src, dest );
+        }
 
 	}
 
