@@ -316,7 +316,7 @@ module.exports = function BowerMap( grunt, bowerPath, destPath, shim, map, repla
 				//console.log( path.fix( k ) );
 				//console.log( path.fix( componentMap[ k ] ) );
 				//grunt.file.copy( path.fix( k ), path.fix( componentMap[ k ] ) );
-				var replacements = replace ? replace[ name ] || {} : {};
+				var replacements = replace ? replace[ name ] || false : false;
 
                 if (  componentMap[ k ] !== false){
                     copyReplace( path.fix( k ), path.fix( componentMap[ k ] ), replacements );
